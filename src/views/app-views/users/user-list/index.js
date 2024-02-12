@@ -6,6 +6,8 @@ import UserView from './UserView';
 import AvatarStatus from 'components/shared-components/AvatarStatus';
 import userData from 'assets/data/user-list.data.json';
 import Loading from 'components/shared-components/Loading';
+import { APP_PREFIX_PATH } from 'configs/AppConfig';
+import { withRouter } from './withRouter';
 
 export class UserList extends Component {
   state = {
@@ -43,6 +45,7 @@ export class UserList extends Component {
   };
 
   showUserProfile = (userInfo) => {
+    console.log('open');
     this.setState({
       userProfileVisible: true,
       selectedUser: userInfo,
@@ -50,6 +53,7 @@ export class UserList extends Component {
   };
 
   closeUserProfile = () => {
+    console.log('close');
     this.setState({
       userProfileVisible: false,
       selectedUser: null,
@@ -111,7 +115,8 @@ export class UserList extends Component {
                 type='primary'
                 className='mr-2'
                 icon={<EyeOutlined />}
-                onClick={() => {
+                onClick={(e) => {
+                  e.stopPropagation();
                   this.showUserProfile(elm);
                 }}
                 size='small'
@@ -135,7 +140,20 @@ export class UserList extends Component {
       <Card bodyStyle={{ padding: '0px' }}>
         <div className='table-responsive'>
           {this.isLoading && <Loading />}
-          <Table columns={tableColumns} dataSource={users} rowKey='id' />
+          <Table
+            columns={tableColumns}
+            dataSource={users}
+            rowKey='id'
+            onRow={(el) => {
+              return {
+                onClick: (e) => {
+                  e.preventDefault();
+                  console.log('click', el.id);
+                  this.props.navigate.push(`${APP_PREFIX_PATH}/main/clients/${el.id}`);
+                },
+              };
+            }}
+          />
         </div>
         <UserView
           data={selectedUser}
@@ -149,4 +167,4 @@ export class UserList extends Component {
   }
 }
 
-export default UserList;
+export default withRouter(UserList);
